@@ -26,3 +26,5 @@ Thumbs.db
 
 # PyCharm
 .idea/
+
+.env
