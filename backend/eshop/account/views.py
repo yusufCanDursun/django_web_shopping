@@ -5,66 +5,50 @@ from django.http import JsonResponse
 from .models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
+import json
+from django.contrib.auth import get_user_model
 
-
+User = get_user_model()
 
 @csrf_exempt
 def register(request):
     if request.method == 'POST':
         try:
+            # JSON verisini parse et
+            data = json.loads(request.body)
+
             required_fields = ['username', 'email', 'password']
-            if not all(field in request.POST for field in required_fields):
+            if not all(field in data for field in required_fields):
                 return JsonResponse({
                     "status": "error",
-                    "message": "Eksik bilgi: username, email ve password gereklidir"
+                    "message": "Eksik bilgi: username, email ve password gereklidir",
+                    "missing_fields": [field for field in required_fields if field not in data]
                 }, status=400)
 
-            email = request.POST['email'].lower().strip()
-            if '@' not in email or '.' not in email.split('@')[-1]:
-                return JsonResponse({
-                    "status": "error",
-                    "message": "Geçersiz email formatı"
-                }, status=400)
-
-            if User.objects.filter(username=request.POST['username']).exists():
-                return JsonResponse({
-                    "status": "error",
-                    "message": "Bu kullanıcı adı zaten alınmış"
-                }, status=400)
-
-            if User.objects.filter(email=email).exists():
-                return JsonResponse({
-                    "status": "error",
-                    "message": "Bu email adresi zaten kayıtlı"
-                }, status=400)
-
-            user_type = request.POST.get('user_type', 'B')
-            if user_type not in dict(User.USER_TYPES).keys():
-                return JsonResponse({
-                    "status": "error",
-                    "message": f"Geçersiz kullanıcı tipi. Geçerli seçenekler: {list(dict(User.USER_TYPES).keys())}"
-                }, status=400)
-
+            # Kullanıcı oluştur
             user = User.objects.create_user(
-                username=request.POST['username'],
-                email=email,
-                password=request.POST['password'],
-                user_type=user_type
+                username=data['username'],
+                email=data['email'],
+                password=data['password'],
+                user_type=data.get('user_type', 'B')
             )
 
             return JsonResponse({
                 "status": "success",
                 "user_id": user.id,
-                "username": user.username,
-                "user_type": user.get_user_type_display(),
-                "message": "Kullanıcı başarıyla oluşturuldu"
+                "username": user.username
             }, status=201)
 
+        except json.JSONDecodeError:
+            return JsonResponse({
+                "status": "error",
+                "message": "Geçersiz JSON formatı"
+            }, status=400)
         except Exception as e:
             return JsonResponse({
                 "status": "error",
-                "message": f"Beklenmeyen hata: {str(e)}"
-            }, status=500)
+                "message": str(e)
+            }, status=400)
 
     return JsonResponse({
         "status": "error",
