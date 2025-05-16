@@ -1,11 +1,15 @@
-import React from 'react';
+import SideProfile from '../components/SideProfile/SideProfile';
 
-function SellerPanel() {
+function Products() {
   return (
-    <div>
-      <h1>ürünler sayası</h1>
+    <div className="products-container">
+      <SideProfile />
+      <div className="products-list">
+        {/* Ürün listesi burada */}
+        <h2>Ürünler</h2>
+      </div>
     </div>
   );
 }
 
-export default SellerPanel;
+export default Products;
