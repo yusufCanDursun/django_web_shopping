@@ -18,9 +18,8 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path='/sellerpanel' element={<SellerPanel/>}/>
-            <Route path='/products' element={<Products/>}/>
-
+            <Route path="/seller-dashboard" element={<SellerPanel />} />
+            <Route path="/products" element={<Products />} />
           </Routes>
         </main>
         <Footer />
