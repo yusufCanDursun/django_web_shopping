@@ -7,6 +7,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
 import json
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+
 
 User = get_user_model()
 
@@ -58,41 +60,60 @@ def register(request):
 @csrf_exempt
 def user_login(request):
     if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
+        try:
+            # JSON verisini parse et
+            data = json.loads(request.body)
+            email = data.get('email')
+            password = data.get('password')
 
-        if not email or not password:
+            if not email or not password:
+                return JsonResponse({
+                    "status": "error",
+                    "message": "Email ve şifre gereklidir"
+                }, status=400)
+
+            user = authenticate(request, email=email, password=password)
+
+            if user is not None:
+                login(request, user)
+                response_data = {
+                    "status": "success",
+                    "user_type": "seller" if user.user_type == 'S' else "buyer",
+                    "message": "Giriş başarılı"
+                }
+
+                if user.user_type == 'S':
+                    response_data["redirect_url"] = "/sellerpanel/"
+                else:
+                    response_data["redirect_url"] = "/products/"
+
+                return JsonResponse(response_data)
+
             return JsonResponse({
                 "status": "error",
-                "message": "Email ve şifre gereklidir"
+                "message": "Geçersiz email veya şifre"
             }, status=400)
 
-        user = authenticate(request, email=email, password=password)
-
-        if user is not None:
-            login(request, user)
-            response_data = {
-                "status": "success",
-                "user_type": "seller" if user.user_type == 'S' else "buyer"
-            }
-
-            if user.user_type == 'S':
-                response_data["redirect_url"] = "/seller-dashboard/"
-            else:
-                response_data["redirect_url"] = "/products/"
-
-            return JsonResponse(response_data)
-
-        return JsonResponse({
-            "status": "error",
-            "message": "Geçersiz email veya şifre"
-        }, status=400)
+        except json.JSONDecodeError:
+            return JsonResponse({
+                "status": "error",
+                "message": "Geçersiz veri formatı"
+            }, status=400)
 
     return JsonResponse({
         "status": "error",
         "message": "Sadece POST isteği kabul edilir"
     }, status=405)
 
+@csrf_exempt
+@login_required
+def user_info(request):
+    if request.method == 'GET':
+        return JsonResponse({
+            "username": request.user.username,
+            "email": request.user.email,
+            "user_type": "seller" if request.user.user_type == 'S' else "buyer"
+        })
 
 @csrf_exempt
 def user_logout(request):
