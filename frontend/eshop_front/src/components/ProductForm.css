@@ -1,0 +1,53 @@
+.product-form {
+  position: fixed;
+  right: 20px;
+  top: 330px; /* SideProfile altına denk gelir */
+  width: 250px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.form-header {
+  background-color: #2c3e50;
+  color: white;
+  padding: 10px 15px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.form-header h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px;
+}
+
+.form-content input,
+.form-content textarea {
+  padding: 8px;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: none;
+}
+
+.form-content button {
+  background-color: #27ae60;
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.form-content button:hover {
+  background-color: #1e8449;
+}
