@@ -1,6 +1,7 @@
 import React from 'react';
+import './ProductCard.css';
 
-// CSRF Token'ı çerezden çeken yardımcı fonksiyon
+
 function getCookie(name) {
   let cookieValue = null;
   if (document.cookie && document.cookie !== '') {
@@ -17,7 +18,9 @@ function getCookie(name) {
 }
 
 function ProductCard({ product, user, onDelete }) {
-  console.log('ProductCard user:', user);
+  const handleAddToCart = () => {
+    alert(`${product.name} sepete eklendi.`);
+  };
 
   const handleDelete = async () => {
     if (!window.confirm('Ürünü silmek istediğinize emin misiniz?')) return;
@@ -32,7 +35,7 @@ function ProductCard({ product, user, onDelete }) {
       });
 
       if (response.ok) {
-        onDelete(product.id);  // Üst komponenti silindiği bilgisini ver
+        onDelete(product.id);
         alert('Ürün başarıyla silindi.');
       } else {
         const errorText = await response.text();
@@ -45,27 +48,29 @@ function ProductCard({ product, user, onDelete }) {
   };
 
   return (
-    <div className="product-card">
-      {product.image ? (
-        <img
-          src={product.image.startsWith('http') ? product.image : `http://localhost:8000${product.image}`}
-          alt={product.name}
-          className="product-image"
-          style={{ width: '100%', maxWidth: '280px', height: 'auto', borderRadius: '8px', marginBottom: '10px' }}
-        />
-      ) : (
-        <div className="no-image">Resim yok</div>
-      )}
-      <h3 className="product-name">{product.name}</h3>
-      <p className="description">{product.description}</p>
-      <p className="price">Fiyat: {product.price}₺</p>
+  <div className="product-card">
+    {product.image ? (
+      <img
+        src={product.image}
+        alt={product.name}
+        className="product-image"
+      />
+    ) : (
+      <div className="no-image">Resim yok</div>
+    )}
+    <h3 className="product-name">{product.name}</h3>
+    <p className="description">{product.description}</p>
+    <p className="price">Fiyat: {product.price}₺</p>
 
-      {/* Kullanıcı satıcı tipindeyse ve bu ürün ona aitse, silme butonunu göster */}
-      {user?.user_type === 'seller' && (
-        <button className="delete-btn" onClick={handleDelete}>Sil</button>
-      )}
-    </div>
-  );
+    {user?.user_type === 'seller' && (
+      <button className="delete-btn" onClick={handleDelete}>Sil</button>
+    )}
+    {(!user || user.user_type === 'buyer') && (
+     <button className="add-to-cart-btn" onClick={handleAddToCart}>Sepete Ekle</button>
+    )}
+  </div>
+);
+
 }
 
 export default ProductCard;
