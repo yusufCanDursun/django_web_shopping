@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import SideProfile from '../components/SideProfile/SideProfile';
 import ProductCard from '../components/ProductsCard/ProductCard';
+import CartCard from '../components/CartCard/CartCard';
 
 function Products() {
   const [products, setProducts] = useState([]);
@@ -25,11 +26,14 @@ function Products() {
   return (
     <div className="products-container" style={{ display: 'flex' }}>
       <SideProfile />
+      <CartCard />
       <div className="products-list" style={{ padding: '20px', width: '100%' }}>
         <h2>Ürünler</h2>
         <div className="product-grid" style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} user={user} />
+            <div className="product-grid"style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+              <ProductCard key={product.id} product={product} user={user} />
+            </div>
           ))}
         </div>
       </div>
